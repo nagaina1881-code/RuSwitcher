@@ -298,9 +298,12 @@ final class KeyboardMonitor: @unchecked Sendable {
             return
         }
 
-        // Буквы считаем только без Cmd/Ctrl/Alt
+        // (Cmd+A, Cmd+C, Cmd+X и т.п.) могло изменить выделение — сбрасываем наш буфер.
         let modifiers = flags.intersection([.maskCommand, .maskControl, .maskAlternate])
-        if !modifiers.isEmpty { return }
+        if !modifiers.isEmpty {
+            fullReset()
+            return
+        }
 
         if KeyMapping.keycodeToEN[keyCode] != nil {
             currentWordKeys.append(TypedKey(keyCode: keyCode, shift: flags.contains(.maskShift), caps: flags.contains(.maskAlphaShift)))
